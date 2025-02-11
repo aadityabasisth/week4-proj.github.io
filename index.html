@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-black p-6">
+    <div class="max-w-2xl mx-auto">
+        <button id="toggleMode" class="mb-4 px-4 py-2 bg-gray-800 text-white rounded">Toggle Mode</button>
+        <div class="bg-white p-6 shadow-lg rounded">
+            <h2 class="text-xl font-bold mb-4">Student Course & Assignment Tracker</h2>
+            <input id="course" class="border p-2 w-full mb-2" type="text" placeholder="Course Name">
+            <input id="assignment" class="border p-2 w-full mb-2" type="text" placeholder="Assignment Details">
+            <button id="addOrUpdate" class="w-full bg-blue-500 text-white py-2 rounded">Add Course</button>
+        </div>
+        <table class="mt-6 w-full border-collapse border border-gray-300">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="border p-2">Course</th>
+                    <th class="border p-2">Assignment</th>
+                    <th class="border p-2">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="courseList"></tbody>
+        </table>
+    </div>
+
+    <script>
+        let courses = [];
+        let editIndex = null;
+        const courseInput = document.getElementById('course');
+        const assignmentInput = document.getElementById('assignment');
+        const addOrUpdateButton = document.getElementById('addOrUpdate');
+        const courseList = document.getElementById('courseList');
+        const toggleMode = document.getElementById('toggleMode');
+        const body = document.body;
+        
+        toggleMode.addEventListener('click', () => {
+            body.classList.toggle('bg-gray-900');
+            body.classList.toggle('text-white');
+        });
+
+        addOrUpdateButton.addEventListener('click', () => {
+            const course = courseInput.value.trim();
+            const assignment = assignmentInput.value.trim();
+            if (course && assignment) {
+                if (editIndex !== null) {
+                    courses[editIndex] = { course, assignment };
+                    editIndex = null;
+                    addOrUpdateButton.textContent = 'Add Course';
+                } else {
+                    courses.push({ course, assignment });
+                }
+                courseInput.value = '';
+                assignmentInput.value = '';
+                renderCourses();
+            }
+        });
+        
+        function renderCourses() {
+            courseList.innerHTML = '';
+            courses.forEach((c, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="border p-2">${c.course}</td>
+                    <td class="border p-2">${c.assignment}</td>
+                    <td class="border p-2">
+                        <button class="bg-yellow-500 text-white px-2 py-1 rounded" onclick="editCourse(${index})">Edit</button>
+                        <button class="bg-red-500 text-white px-2 py-1 rounded ml-2" onclick="deleteCourse(${index})">Delete</button>
+                    </td>
+                `;
+                courseList.appendChild(row);
+            });
+        }
+
+        function editCourse(index) {
+            courseInput.value = courses[index].course;
+            assignmentInput.value = courses[index].assignment;
+            editIndex = index;
+            addOrUpdateButton.textContent = 'Update Course';
+        }
+        
+        function deleteCourse(index) {
+            courses.splice(index, 1);
+            renderCourses();
+        }
+    </script>
+</body>
+</html>
