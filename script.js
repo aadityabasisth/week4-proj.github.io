@@ -7,8 +7,20 @@ const courseList = document.getElementById('courseList');
 const toggleMode = document.getElementById('toggleMode');
 const body = document.body;
 
+// Check local storage for dark mode preference
+if (localStorage.getItem('darkMode') === 'enabled') {
+    body.classList.add('dark');
+}
+
+// Toggle dark mode and save preference
 toggleMode.addEventListener('click', () => {
-    body.classList.toggle('dark-mode');
+    if (body.classList.contains('dark')) {
+        body.classList.remove('dark');
+        localStorage.setItem('darkMode', 'disabled');
+    } else {
+        body.classList.add('dark');
+        localStorage.setItem('darkMode', 'enabled');
+    }
 });
 
 addOrUpdateButton.addEventListener('click', () => {
@@ -33,11 +45,13 @@ function renderCourses() {
     courses.forEach((c, index) => {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${c.course}</td>
-            <td>${c.assignment}</td>
-            <td>
-                <button onclick="editCourse(${index})">Edit</button>
-                <button onclick="deleteCourse(${index})">Delete</button>
+            <td class="p-2 border">${c.course}</td>
+            <td class="p-2 border">${c.assignment}</td>
+            <td class="p-2 border">
+                <button class="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600"
+                    onclick="editCourse(${index})">Edit</button>
+                <button class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+                    onclick="deleteCourse(${index})">Delete</button>
             </td>
         `;
         courseList.appendChild(row);
@@ -52,6 +66,8 @@ function editCourse(index) {
 }
 
 function deleteCourse(index) {
-    courses.splice(index, 1);
-    renderCourses();
+    if (confirm('Are you sure you want to delete this course?')) {
+        courses.splice(index, 1);
+        renderCourses();
+    }
 }
